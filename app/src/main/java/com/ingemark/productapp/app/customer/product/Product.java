@@ -36,5 +36,5 @@ public class Product implements IdentifiableEntity
     private BigDecimal priceEur;
 
     @Column(name = "is_available", nullable = false)
-    private boolean isAvailable;
+    private Boolean isAvailable;
 }

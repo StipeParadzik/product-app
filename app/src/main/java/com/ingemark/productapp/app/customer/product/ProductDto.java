@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ingemark.productapp.app.customer.product.validation.UniqueProductCode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Data
 @UniqueProductCode
@@ -16,6 +17,7 @@ public class ProductDto
     private Integer id;
 
     @NotBlank
+    @Size(min = 10, max = 10, message = "Code must be exactly 10 characters long")
     private String code;
 
     @NotBlank

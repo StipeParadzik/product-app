@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
+import com.ingemark.productapp.app.util.ObjectNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -125,6 +126,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
     public ResponseEntity<StandardErrorResponse> handleAbstractUnprocessableEntityException(RuntimeException ex)
     {
         return buildResponse(ex, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @ExceptionHandler(ObjectNotFoundException.class)
+    public ResponseEntity<StandardErrorResponse> handleObjectNotFoundException(RuntimeException ex)
+    {
+        return buildResponse(ex, HttpStatus.NOT_FOUND);
     }
 
     private ResponseEntity<StandardErrorResponse> buildResponse(RuntimeException ex, HttpStatus status)
