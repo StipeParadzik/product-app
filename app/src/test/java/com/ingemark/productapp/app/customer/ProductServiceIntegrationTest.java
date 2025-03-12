@@ -4,10 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,7 +16,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
@@ -56,7 +51,7 @@ class ProductServiceIntegrationTest extends AbstractIntegrationTest
     @Order(1)
     void lists() throws Exception
     {
-        mockMvc.perform(get(URI))
+        mockMvc.perform(testHelper.createGetRequest(URI))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(3)));
     }
@@ -68,7 +63,7 @@ class ProductServiceIntegrationTest extends AbstractIntegrationTest
         Product product = persistentProducts.get(0);
         Integer id = product.getId();
 
-        mockMvc.perform(get(URI + "/" + id))
+        mockMvc.perform(testHelper.createGetByIdRequest(URI, id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(id))
             .andExpect(jsonPath("$.code", is(product.getCode())))
@@ -89,8 +84,7 @@ class ProductServiceIntegrationTest extends AbstractIntegrationTest
         productDto.setPriceEur(BigDecimal.valueOf(99.99));
         productDto.setIsAvailable(true);
 
-        MvcResult mvcResult = mockMvc.perform(post(URI).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productDto)))
+        MvcResult mvcResult = mockMvc.perform(testHelper.createPostRequest(URI, productDto))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code", is(productDto.getCode())))
             .andExpect(jsonPath("$.name", is(productDto.getName())))
@@ -117,8 +111,7 @@ class ProductServiceIntegrationTest extends AbstractIntegrationTest
         productDto.setPriceEur(BigDecimal.valueOf(49.99));
         productDto.setIsAvailable(true);
 
-        mockMvc.perform(post(URI).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productDto)))
+        mockMvc.perform(testHelper.createPostRequest(URI, productDto))
             .andExpect(status().isUnprocessableEntity())
             .andExpect(result -> assertInstanceOf(MethodArgumentNotValidException.class,
                 result.getResolvedException()));
@@ -134,14 +127,12 @@ class ProductServiceIntegrationTest extends AbstractIntegrationTest
         productDto.setPriceEur(BigDecimal.valueOf(99.99));
         productDto.setIsAvailable(true);
 
-        mockMvc.perform(post(URI).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productDto)))
+        mockMvc.perform(testHelper.createPostRequest(URI, productDto))
             .andExpect(status().isUnprocessableEntity())
             .andExpect(jsonPath("$.fieldErrors.code").exists());
 
         productDto.setCode("SHORT");
-        mockMvc.perform(post(URI).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productDto)))
+        mockMvc.perform(testHelper.createPostRequest(URI, productDto))
             .andExpect(status().isUnprocessableEntity())
             .andExpect(jsonPath("$.fieldErrors.code").exists());
     }
@@ -159,8 +150,7 @@ class ProductServiceIntegrationTest extends AbstractIntegrationTest
         updatedProduct.setPriceEur(BigDecimal.valueOf(129.99));
         updatedProduct.setIsAvailable(false);
 
-        mockMvc.perform(put(URI + "/" + id).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(updatedProduct)))
+        mockMvc.perform(testHelper.createUpdateRequest(URI, id, updatedProduct))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code", is(updatedProduct.getCode())))
             .andExpect(jsonPath("$.name", is(updatedProduct.getName())))
@@ -181,8 +171,7 @@ class ProductServiceIntegrationTest extends AbstractIntegrationTest
     {
         Integer id = persistentProducts.get(2)
             .getId();
-
-        mockMvc.perform(delete(URI + "/" + id))
+        mockMvc.perform(testHelper.createDeleteRequest(URI, id))
             .andExpect(status().isOk());
 
         assertThat(repository.findById(id)).isEmpty();
