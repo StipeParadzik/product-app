@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import lombok.Data;
 
 import com.ingemark.codegeneration.GenerateController;
-import com.ingemark.codegeneration.GenerateRepository;
 import com.ingemark.codegeneration.GenerateService;
 import com.ingemark.productapp.app.entity.identifiable.IdentifiableEntity;
 import jakarta.persistence.Column;
