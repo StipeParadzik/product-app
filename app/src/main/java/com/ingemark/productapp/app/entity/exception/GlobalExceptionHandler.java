@@ -12,6 +12,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
@@ -108,6 +110,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler
         responseBody.put("timestamp", LocalDateTime.now());
 
         return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ AccessDeniedException.class, AuthenticationException.class })
+    public ResponseEntity<StandardErrorResponse> handleAccessDeniedException(Exception ex)
+    {
+        StandardErrorResponse response = new StandardErrorResponse(HttpStatus.FORBIDDEN.value(),
+            HttpStatus.FORBIDDEN.getReasonPhrase(),
+            ex.getMessage(),
+            LocalDateTime.now(),
+            Map.of());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(response);
     }
 
     @ExceptionHandler(Exception.class)
