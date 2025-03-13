@@ -28,7 +28,6 @@ import com.ingemark.productapp.app.customer.product.ProductRepository;
 @TestMethodOrder(OrderAnnotation.class)
 class ProductServiceIntegrationTest extends AbstractIntegrationTest
 {
-
     private static final String URI = "/api/v1/products";
 
     @Autowired

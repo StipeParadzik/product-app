@@ -2,6 +2,7 @@ package com.ingemark.productapp.app.auth;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +12,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtUtil
 {
-    private final String SECRET_KEY = "dlE3Oi7oCB1gPpxBYHoALcZCnt12XumT/xl1uS7VUs8="; // Store securely
+    @Value("${jwt.secret-key}")
+    private String secretKey;
 
     public String generateToken(UserDetails userDetails)
     {
@@ -22,14 +24,14 @@ public class JwtUtil
                     .toString())
             .setIssuedAt(new Date())
             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
-            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+            .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact();
     }
 
     public String extractUsername(String token)
     {
         return Jwts.parser()
-            .setSigningKey(SECRET_KEY)
+            .setSigningKey(secretKey)
             .parseClaimsJws(token)
             .getBody()
             .getSubject();
@@ -44,7 +46,7 @@ public class JwtUtil
     private boolean isTokenExpired(String token)
     {
         Date expiration = Jwts.parser()
-            .setSigningKey(SECRET_KEY)
+            .setSigningKey(secretKey)
             .parseClaimsJws(token)
             .getBody()
             .getExpiration();
